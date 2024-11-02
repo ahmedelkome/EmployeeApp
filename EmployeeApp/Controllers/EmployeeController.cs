@@ -17,18 +17,7 @@ namespace EmployeeApp.Controllers
             _context = context;
         }
 
-        /*
-         @Id 
-         @FName 
-         @LName 
-         @age 
-         @salary 
-         @country
-         @phone
-         @gender 
-         @email 
-         @state 
-         */
+
 
         [HttpPost(Name = "InsertEmployee")]
         public async Task<IActionResult> InsertEmployee(Employee employee)
@@ -53,8 +42,8 @@ namespace EmployeeApp.Controllers
             return Ok(employee);
         }
 
-        [HttpPut(Name = "UpdateEmployee")]
-        public async Task<IActionResult> UpdateEmployee(int id,Employee employee)
+        [HttpPut(Name = "UpdateEmployee/{id}")]
+        public async Task<IActionResult> UpdateEmployee(int id, Employee employee)
         {
             var parameters = new[] {
 
@@ -71,29 +60,37 @@ namespace EmployeeApp.Controllers
 
             };
 
-            await _context.Database.ExecuteSqlRawAsync("EXEC SaveOrUpdateEmployee @Id,@FName,@LName,@age,@salary,@country,@phone,@gender,@email,@state ",
-                parameters);
-            return Ok(employee);
-        }
-
-
-        [HttpDelete(Name = "DeleteEmployee")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            var parameters = new[] {
-
-                new SqlParameter("@Id",id),
-      
-
-            };
             var user = _context.Employees.Find(id);
-             if (user == null) 
+            if (user == null)
             {
                 return NotFound();
             }
             else
             {
-                await _context.Database.ExecuteSqlRawAsync("EXEC DeleteEmployee @id",parameters);
+                await _context.Database.ExecuteSqlRawAsync("EXEC SaveOrUpdateEmployee @Id,@FName,@LName,@age,@salary,@country,@phone,@gender,@email,@state ",
+                    parameters);
+                return Ok(employee);
+            }
+        }
+
+
+        [HttpDelete(Name = "DeleteEmployee/{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            var parameters = new[] {
+
+                new SqlParameter("@Id",id),
+
+
+            };
+            var user = _context.Employees.Find(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                await _context.Database.ExecuteSqlRawAsync("EXEC DeleteEmployee @id", parameters);
                 return Ok();
             }
         }
